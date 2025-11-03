@@ -43,6 +43,7 @@ dependencies:
     # DevTools
   device_preview: ^1.1.0
   timeago: ^3.6.1
+  equatable: ^2.0.5
 
 
 dev_dependencies:

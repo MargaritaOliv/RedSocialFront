@@ -1,3 +1,5 @@
+// lib/feactures/auth/data/datasource/auth_remote_datasource.dart
+
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redsocial/core/network/http_client.dart';
@@ -23,7 +25,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<LoginResponseModel> login(LoginRequestModel loginRequest) async {
-    final url = Uri.parse('$baseUrl/auth/login');
+    // AJUSTE DE ENDPOINT: /api/auth/login
+    final url = Uri.parse('$baseUrl/api/auth/login');
 
     try {
       final response = await client.post(
@@ -49,7 +52,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<UserModel> register(String name, String email, String password) async {
-    final url = Uri.parse('$baseUrl/auth/register');
+    // AJUSTE DE ENDPOINT: /api/auth/register
+    final url = Uri.parse('$baseUrl/api/auth/register');
 
     try {
       final response = await client.post(
@@ -66,6 +70,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> decoded = json.decode(response.body);
+        // Asumimos que la respuesta incluye el UserModel
         return UserModel.fromJson(decoded['user'] ?? decoded);
       } else {
         throw ServerException("Error al registrar. Código: ${response.statusCode}");

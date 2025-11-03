@@ -1,3 +1,5 @@
+// lib/feactures/auth/presentation/providers/auth_notifier.dart (SOLO LOGIN)
+
 import 'package:flutter/foundation.dart';
 import 'package:redsocial/core/application/app_state.dart';
 import 'package:redsocial/feactures/auth/data/datasource/auth_remote_datasource.dart';
@@ -20,6 +22,7 @@ class AuthNotifier extends ChangeNotifier {
       authRemoteDataSource: authRemoteDataSource,
     );
     _loginUseCase = LoginUseCase(authRepository);
+    // [register_usecase] ELIMINADO
   }
 
   AuthStateStatus _status = AuthStateStatus.initial;
@@ -47,6 +50,13 @@ class AuthNotifier extends ChangeNotifier {
       _errorMessage = e.toString();
       notifyListeners();
     }
+  }
+
+  // MÉTODO register ELIMINADO
+
+  void setUser(User user) {
+    _currentUser = user;
+    notifyListeners();
   }
 
   Future<void> logout() async {

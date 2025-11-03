@@ -1,7 +1,12 @@
+// lib/feactures/auth/presentation/pages/login_screen.dart (FINAL)
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/router/routes.dart';
+import 'package:redsocial/core/router/routes.dart';
+// Asumimos que CustomButton y CustomTextField están disponibles via import
+import 'package:redsocial/feactures/auth/presentation/widgets/custom_button.dart';
+import 'package:redsocial/feactures/auth/presentation/widgets/custom_text_field.dart';
 import '../providers/auth_notifier.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -223,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             ),
                             const SizedBox(height: 16),
 
-                            // Divider
+                            // Opcionales (Divider y Google Button)
                             Row(
                               children: [
                                 Expanded(child: Divider(color: colorScheme.outline)),
@@ -241,7 +246,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             ),
                             const SizedBox(height: 16),
 
-                            // Botón Google (opcional)
                             _buildOutlinedButton(
                               text: 'Continuar con Google',
                               icon: Icons.g_mobiledata,
@@ -251,30 +255,21 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             ),
                             const SizedBox(height: 24),
 
-                            // Registrarse
+                            // ENLACE DE REGISTRO ELIMINADO:
+                            /*
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  '¿No tienes cuenta? ',
-                                  style: TextStyle(
-                                    color: colorScheme.onSurface.withOpacity(0.7),
-                                  ),
-                                ),
+                                Text('¿No tienes cuenta? '),
                                 TextButton(
                                   onPressed: () {
-                                    context.pushNamed(AppRoutes.register);
+                                    context.goNamed(AppRoutes.register);
                                   },
-                                  child: Text(
-                                    'Regístrate',
-                                    style: TextStyle(
-                                      color: colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  child: Text('Regístrate'),
                                 ),
                               ],
                             ),
+                            */
                           ],
                         ),
                       ),
@@ -289,6 +284,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     );
   }
 
+  // Incluir los métodos auxiliares (asumiendo que los usaste en tu LoginScreen):
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,

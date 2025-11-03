@@ -1,80 +1,39 @@
-import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:redsocial/core/network/http_client.dart';
-import 'package:http/http.dart' as http;
+// lib/feactures/auth/data/repository/auth_repository_impl.dart
 
-import '../../../../core/error/exception.dart';
-import '../models/login_request_model.dart';
-import '../models/login_response_model.dart';
-import '../models/user_model.dart';
+import 'package:redsocial/feactures/auth/data/datasource/auth_remote_datasource.dart';
+import 'package:redsocial/feactures/auth/data/models/login_request_model.dart';
+import 'package:redsocial/feactures/auth/domain/entities/user.dart';
+import 'package:redsocial/feactures/auth/domain/repository/auth_repository.dart';
 
-abstract class AuthRemoteDataSource {
-  Future<LoginResponseModel> login(LoginRequestModel loginRequest);
-  Future<UserModel> register(String name, String email, String password);
-}
+class AuthRepositoryImpl implements AuthRepository {
+  final AuthRemoteDataSource authRemoteDataSource;
 
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final http.Client client;
-
-  AuthRemoteDataSourceImpl({http.Client? client})
-      : client = client ?? HttpClient().client;
-
-  // Obtener la URL base desde .env
-  String get baseUrl => dotenv.env['API_URL'] ?? 'http://localhost:3000';
+  AuthRepositoryImpl({required this.authRemoteDataSource});
 
   @override
-  Future<LoginResponseModel> login(LoginRequestModel loginRequest) async {
-    final url = Uri.parse('$baseUrl/auth/login');
-
-    try {
-      final response = await client.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: json.encode(loginRequest.toJson()),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> decoded = json.decode(response.body);
-        return LoginResponseModel.fromJson(decoded);
-      } else {
-        throw ServerException("Error al iniciar sesión. Código: ${response.statusCode}");
-      }
-    } catch (e, stacktrace) {
-      print("Error en login: $e");
-      print(stacktrace);
-      throw NetworkException(e.toString());
-    }
+  Future<User> login(String email, String password) async {
+    final loginRequest = LoginRequestModel(email: email, password: password);
+    final response = await authRemoteDataSource.login(loginRequest);
+    // Aquí se podría guardar el token (response.token) en SharedPreferences/SecureStorage
+    return response.user;
   }
 
   @override
-  Future<UserModel> register(String name, String email, String password) async {
-    final url = Uri.parse('$baseUrl/auth/register');
+  Future<User> register(String name, String email, String password) async {
+    // Llama al datasource para registrar, que devuelve el UserModel.
+    final userModel = await authRemoteDataSource.register(name, email, password);
+    return userModel; // UserModel extiende User, por lo que cumple con el contrato.
+  }
 
-    try {
-      final response = await client.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: json.encode({
-          'name': name,
-          'email': email,
-          'password': password,
-        }),
-      );
+  @override
+  Future<User?> getCurrentUser() {
+    // TODO: Implementar lógica para obtener el usuario de almacenamiento local.
+    return Future.value(null);
+  }
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> decoded = json.decode(response.body);
-        return UserModel.fromJson(decoded['user'] ?? decoded);
-      } else {
-        throw ServerException("Error al registrar. Código: ${response.statusCode}");
-      }
-    } catch (e, stacktrace) {
-      print("Error en register: $e");
-      print(stacktrace);
-      throw NetworkException(e.toString());
-    }
+  @override
+  Future<void> logout() {
+    // TODO: Implementar lógica para limpiar el token de autenticación.
+    return Future.value();
   }
 }
