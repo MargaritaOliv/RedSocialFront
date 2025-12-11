@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:redsocial/feactures/home/domain/entities/posts.dart';
 import 'package:redsocial/feactures/home/domain/usecase/get_posts_usecase.dart';
-import 'package:redsocial/feactures/home/data/datasource/posts_remote_datasource.dart';
-import 'package:redsocial/feactures/home/data/repository/posts_repository_impl.dart';
 
 enum PostsStateStatus { initial, loading, loaded, error }
 
 class PostsNotifier extends ChangeNotifier {
-  late final GetPostsUseCase _getPostsUseCase;
+  // Inyectamos el UseCase en lugar de crearlo dentro
+  final GetPostsUseCase getPostsUseCase;
 
-  PostsNotifier() {
-    final remoteDataSource = PostsRemoteDataSourceImpl();
-    final postsRepository = PostsRepositoryImpl(remoteDataSource: remoteDataSource);
-    _getPostsUseCase = GetPostsUseCase(postsRepository);
-  }
+  PostsNotifier({required this.getPostsUseCase});
 
   PostsStateStatus _status = PostsStateStatus.initial;
   String? _errorMessage;
@@ -29,7 +24,7 @@ class PostsNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _posts = await _getPostsUseCase.call();
+      _posts = await getPostsUseCase.call();
       _status = PostsStateStatus.loaded;
       notifyListeners();
     } catch (e) {

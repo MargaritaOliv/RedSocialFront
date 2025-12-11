@@ -4,24 +4,20 @@ import 'package:redsocial/feactures/post_detail/domain/entities/comment.dart';
 import 'package:redsocial/feactures/post_detail/domain/usecase/add_comment_usecase.dart';
 import 'package:redsocial/feactures/post_detail/domain/usecase/get_post_full_data_usecase.dart';
 import 'package:redsocial/feactures/post_detail/domain/usecase/toggle_like_usecase.dart';
-import 'package:redsocial/feactures/post_detail/data/datasource/post_detail_remote_datasource.dart';
-import 'package:redsocial/feactures/post_detail/data/repository/post_detail_repository_impl.dart';
 
 enum PostDetailStatus { initial, loading, loaded, error }
 
 class PostDetailNotifier extends ChangeNotifier {
-  late final GetPostFullDataUseCase _getDataUseCase;
-  late final AddCommentUseCase _addCommentUseCase;
-  late final ToggleLikeUseCase _toggleLikeUseCase;
+  // Inyección de dependencias
+  final GetPostFullDataUseCase getDataUseCase;
+  final AddCommentUseCase addCommentUseCase;
+  final ToggleLikeUseCase toggleLikeUseCase;
 
-  PostDetailNotifier() {
-    final dataSource = PostDetailRemoteDataSourceImpl();
-    final repository = PostDetailRepositoryImpl(remoteDataSource: dataSource);
-
-    _getDataUseCase = GetPostFullDataUseCase(repository);
-    _addCommentUseCase = AddCommentUseCase(repository);
-    _toggleLikeUseCase = ToggleLikeUseCase(repository);
-  }
+  PostDetailNotifier({
+    required this.getDataUseCase,
+    required this.addCommentUseCase,
+    required this.toggleLikeUseCase,
+  });
 
   PostDetailStatus _status = PostDetailStatus.initial;
   String? _errorMessage;
@@ -41,10 +37,10 @@ class PostDetailNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = await _getDataUseCase.call(postId);
+      final data = await getDataUseCase.call(postId);
       _post = data.post;
       _comments = data.comments;
-      _isLiked = false;
+      _isLiked = false; // Aquí podrías mapear si el usuario ya dio like si el back lo devuelve
 
       _status = PostDetailStatus.loaded;
       notifyListeners();
@@ -60,13 +56,14 @@ class PostDetailNotifier extends ChangeNotifier {
     if (text.trim().isEmpty) return;
 
     try {
-      final newComment = await _addCommentUseCase.call(postId, text);
+      final newComment = await addCommentUseCase.call(postId, text);
 
       _comments.insert(0, newComment);
       notifyListeners();
 
     } catch (e) {
       print('Error al añadir comentario: $e');
+      // Podrías manejar un estado de error específico para comentarios si quisieras
     }
   }
 
@@ -75,9 +72,9 @@ class PostDetailNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _toggleLikeUseCase.call(postId);
+      await toggleLikeUseCase.call(postId);
     } catch (e) {
-      _isLiked = !_isLiked;
+      _isLiked = !_isLiked; // Revertir si falla
       notifyListeners();
       print('Error al cambiar like: $e');
     }

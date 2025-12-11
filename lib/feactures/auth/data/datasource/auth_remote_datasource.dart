@@ -1,7 +1,6 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:redsocial/core/network/http_client.dart';
 import 'package:http/http.dart' as http;
+import 'package:redsocial/core/network/http_client.dart';
 import '../../../../core/error/exception.dart';
 import '../models/login_request_model.dart';
 import '../models/login_response_model.dart';
@@ -14,17 +13,16 @@ abstract class AuthRemoteDataSource {
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final http.Client client;
+  final String baseUrl;
 
-  AuthRemoteDataSourceImpl({http.Client? client})
-      : client = client ?? HttpClient().client;
-
-  // Obtener la URL base desde ..env
-  String get baseUrl => dotenv.env['API_URL'] ?? 'http://localhost:3000';
+  // Inyectamos el HttpClient y extraemos su client y su baseUrl
+  AuthRemoteDataSourceImpl({HttpClient? httpClient})
+      : client = (httpClient ?? HttpClient()).client,
+        baseUrl = (httpClient ?? HttpClient()).baseUrl;
 
   @override
   Future<LoginResponseModel> login(LoginRequestModel loginRequest) async {
-    // AJUSTE DE ENDPOINT: /api/auth/login
-    final url = Uri.parse('$baseUrl/api/auth/login');
+    final url = Uri.parse('$baseUrl/auth/login');
 
     try {
       final response = await client.post(
@@ -39,19 +37,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         final Map<String, dynamic> decoded = json.decode(response.body);
         return LoginResponseModel.fromJson(decoded);
       } else {
-        throw ServerException("Error al iniciar sesión. Código: ${response.statusCode}");
+        // Manejo básico de error basado en la respuesta de tu API
+        final errorBody = json.decode(response.body);
+        throw ServerException(errorBody['message'] ?? "Error al iniciar sesión");
       }
-    } catch (e, stacktrace) {
-      print("Error en login: $e");
-      print(stacktrace);
+    } catch (e) {
+      if (e is ServerException) rethrow;
       throw NetworkException(e.toString());
     }
   }
 
   @override
   Future<UserModel> register(String name, String email, String password) async {
-    // AJUSTE DE ENDPOINT: /api/auth/register
-    final url = Uri.parse('$baseUrl/api/auth/register');
+    final url = Uri.parse('$baseUrl/auth/register');
 
     try {
       final response = await client.post(
@@ -66,16 +64,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         }),
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> decoded = json.decode(response.body);
-        // Asumimos que la respuesta incluye el UserModel
-        return UserModel.fromJson(decoded['user'] ?? decoded);
+      if (response.statusCode == 201) {
+        // Tu API devuelve un mensaje de éxito, simulamos el retorno del usuario
+        // ya que el endpoint /register no devuelve el objeto usuario completo según tu código backend.
+        return UserModel(
+          id: '',
+          name: name,
+          email: email,
+          // Los demás campos se llenarán por defecto o null según tu modelo
+        );
       } else {
-        throw ServerException("Error al registrar. Código: ${response.statusCode}");
+        final errorBody = json.decode(response.body);
+        throw ServerException(errorBody['message'] ?? "Error al registrar usuario");
       }
-    } catch (e, stacktrace) {
-      print("Error en register: $e");
-      print(stacktrace);
+    } catch (e) {
+      if (e is ServerException) rethrow;
       throw NetworkException(e.toString());
     }
   }

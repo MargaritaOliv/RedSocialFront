@@ -3,21 +3,13 @@ import 'package:redsocial/feactures/auth/domain/entities/user.dart';
 import 'package:redsocial/feactures/home/domain/entities/posts.dart';
 import 'package:redsocial/feactures/profile/domain/entities/profile_data.dart';
 import 'package:redsocial/feactures/profile/domain/usecase/get_profile_data_usecase.dart';
-import 'package:redsocial/feactures/profile/data/datasource/profile_remote_datasource.dart';
-import 'package:redsocial/feactures/profile/data/repository/profile_repository_impl.dart';
 
 enum ProfileStatus { initial, loading, loaded, error }
 
 class ProfileNotifier extends ChangeNotifier {
-  late final GetProfileDataUseCase _useCase;
+  final GetProfileDataUseCase getProfileDataUseCase;
 
-  ProfileNotifier() {
-    final dataSource = ProfileRemoteDataSourceImpl();
-
-    final repository = ProfileRepositoryImpl(remoteDataSource: dataSource);
-
-    _useCase = GetProfileDataUseCase(repository);
-  }
+  ProfileNotifier({required this.getProfileDataUseCase});
 
   ProfileStatus _status = ProfileStatus.initial;
   String? _errorMessage;
@@ -35,7 +27,7 @@ class ProfileNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final ProfileData data = await _useCase.call();
+      final ProfileData data = await getProfileDataUseCase.call();
 
       _user = data.user;
       _posts = data.posts;
