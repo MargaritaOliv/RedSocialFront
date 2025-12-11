@@ -1,10 +1,9 @@
-// feactures/create_post/data/datasource/create_post_remote_datasource.dart
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redsocial/core/network/http_client.dart';
 import 'package:redsocial/core/error/exception.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Importante
 import '../models/create_post_request_model.dart';
 
 abstract class CreatePostRemoteDataSource {
@@ -19,31 +18,51 @@ class CreatePostRemoteDataSourceImpl implements CreatePostRemoteDataSource {
 
   String get baseUrl => dotenv.env['API_URL'] ?? 'http://localhost:3000';
 
+  // --- LÓGICA DE SEGURIDAD (Igual que en Home) ---
+  Future<Map<String, String>> _getHeaders() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      throw ServerException("Debes iniciar sesión para publicar.");
+    }
+
+    return {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    };
+  }
+  // ----------------------------------------------
+
   @override
   Future<void> createPost(CreatePostRequestModel postRequest) async {
-    // Endpoint: POST http://localhost:3000/api/posts
+    // Endpoint: /api/posts
     final url = Uri.parse('$baseUrl/api/posts');
-
-    // TODO: Obtener el token de autorización (e.g., de SharedPreferences o AuthNotifier)
-    const String dummyToken = 'YOUR_AUTH_TOKEN';
 
     try {
       final response = await client.post(
         url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $dummyToken",
-        },
+        headers: await _getHeaders(), // Inyectamos el Token
         body: json.encode(postRequest.toJson()),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return; // Éxito en la creación
+        return; // Éxito
       } else {
-        throw ServerException("Error al crear publicación. Código: ${response.statusCode}");
+        // Intentamos leer el mensaje de error del servidor
+        String msg = "Error al crear publicación (${response.statusCode})";
+        try {
+          final errorBody = json.decode(response.body);
+          if (errorBody['message'] != null) {
+            msg = errorBody['message'];
+          }
+        } catch (_) {}
+
+        throw ServerException(msg);
       }
     } catch (e) {
-      throw NetworkException("Error de red al crear publicación: $e");
+      if (e is ServerException) rethrow;
+      throw NetworkException("Error de red: $e");
     }
   }
 }

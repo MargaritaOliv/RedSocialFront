@@ -1,7 +1,7 @@
-// feactures/home/presentation/widgets/post_card.dart
-
 import 'package:flutter/material.dart';
-import 'package:redsocial/feactures/home/domain/entities/posts.dart'; // Correcto
+import 'package:go_router/go_router.dart';
+import 'package:redsocial/core/router/routes.dart';
+import 'package:redsocial/feactures/home/domain/entities/posts.dart';
 
 class PostCard extends StatelessWidget {
   final Posts post;
@@ -16,44 +16,96 @@ class PostCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          context.pushNamed(
+            AppRoutes.postDetail,
+            pathParameters: {'id': post.id},
+          );
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Título
-            Text(
-              post.title.toUpperCase(),
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.primary,
+            SizedBox(
+              height: 200,
+              width: double.infinity,
+              child: Image.network(
+                post.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: colorScheme.surfaceContainerHighest,
+                    child: const Icon(Icons.broken_image, size: 50),
+                  );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
               ),
             ),
-            const SizedBox(height: 8),
 
-            // Cuerpo
-            Text(
-              post.body,
-              style: TextStyle(
-                fontSize: 14,
-                color: colorScheme.onSurface.withOpacity(0.8),
-              ),
-            ),
-            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    post.title,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
 
-            // ID del Post
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                'ID: ${post.id}',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                  color: colorScheme.onSurface.withOpacity(0.6),
-                ),
+                  Text(
+                    post.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 12,
+                        backgroundColor: colorScheme.primary,
+                        backgroundImage: post.authorPhoto != null
+                            ? NetworkImage(post.authorPhoto!)
+                            : null,
+                        child: post.authorPhoto == null
+                            ? const Icon(Icons.person, size: 14, color: Colors.white)
+                            : null,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        post.authorName,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],

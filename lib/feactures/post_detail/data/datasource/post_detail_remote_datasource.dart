@@ -1,11 +1,10 @@
-// feactures/post_detail/data/datasource/post_detail_remote_datasource.dart
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redsocial/core/network/http_client.dart';
 import 'package:redsocial/core/error/exception.dart';
-import 'package:redsocial/feactures/home/data/models/posts_model.dart'; // Reutilizamos PostsModel
+import 'package:redsocial/feactures/home/data/models/posts_model.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Importante
 import '../models/comment_model.dart';
 import '../models/add_comment_request_model.dart';
 
@@ -24,89 +23,97 @@ class PostDetailRemoteDataSourceImpl implements PostDetailRemoteDataSource {
 
   String get baseUrl => dotenv.env['API_URL'] ?? 'http://localhost:3000';
 
-  // TODO: Implementar la obtención segura del Token de Auth
-  final String dummyToken = 'YOUR_AUTH_TOKEN_FROM_STORAGE';
+  Future<Map<String, String>> _getHeaders() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      throw ServerException("Debes iniciar sesión.");
+    }
+
+    return {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    };
+  }
 
   @override
   Future<PostsModel> fetchPostDetail(String postId) async {
-    // GET /api/posts/:id
     final url = Uri.parse('$baseUrl/api/posts/$postId');
 
     try {
-      final response = await client.get(url);
+      final response = await client.get(url, headers: await _getHeaders());
+
       if (response.statusCode == 200) {
-        final Map<String, dynamic> decoded = json.decode(response.body);
-        return PostsModel.fromJson(decoded['post'] ?? decoded);
+        final dynamic decoded = json.decode(response.body);
+        return PostsModel.fromJson(decoded);
       } else {
         throw ServerException("Error al obtener post: ${response.statusCode}");
       }
     } catch (e) {
-      throw NetworkException("Error de red al obtener post: $e");
+      if (e is ServerException) rethrow;
+      throw NetworkException("Error de red: $e");
     }
   }
 
   @override
   Future<List<CommentModel>> fetchPostComments(String postId) async {
-    // GET /api/posts/:id/comments
     final url = Uri.parse('$baseUrl/api/posts/$postId/comments');
 
     try {
-      final response = await client.get(url);
+      final response = await client.get(url, headers: await _getHeaders());
+
       if (response.statusCode == 200) {
         final List<dynamic> decoded = json.decode(response.body);
         return decoded.map((e) => CommentModel.fromJson(e)).toList();
       } else {
-        throw ServerException("Error al obtener comentarios: ${response.statusCode}");
+        throw ServerException("Error al cargar comentarios: ${response.statusCode}");
       }
     } catch (e) {
-      throw NetworkException("Error de red al obtener comentarios: $e");
+      if (e is ServerException) rethrow;
+      throw NetworkException("Error de red: $e");
     }
   }
 
   @override
   Future<CommentModel> addComment(String postId, AddCommentRequestModel request) async {
-    // POST /api/posts/:id/comments
     final url = Uri.parse('$baseUrl/api/posts/$postId/comments');
 
     try {
       final response = await client.post(
         url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $dummyToken",
-        },
+        headers: await _getHeaders(),
         body: json.encode(request.toJson()),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> decoded = json.decode(response.body);
-        return CommentModel.fromJson(decoded['comment'] ?? decoded);
+        final dynamic decoded = json.decode(response.body);
+        return CommentModel.fromJson(decoded);
       } else {
-        throw ServerException("Error al añadir comentario: ${response.statusCode}");
+        throw ServerException("Error al publicar comentario: ${response.statusCode}");
       }
     } catch (e) {
-      throw NetworkException("Error de red al añadir comentario: $e");
+      if (e is ServerException) rethrow;
+      throw NetworkException("Error de red: $e");
     }
   }
 
   @override
   Future<void> toggleLike(String postId) async {
-    // POST /api/posts/:id/like
     final url = Uri.parse('$baseUrl/api/posts/$postId/like');
 
     try {
       final response = await client.post(
         url,
-        headers: {
-          "Authorization": "Bearer $dummyToken",
-        },
+        headers: await _getHeaders(),
       );
 
       if (response.statusCode != 200) {
         throw ServerException("Error al dar like: ${response.statusCode}");
       }
     } catch (e) {
-      throw NetworkException("Error de red al dar like: $e");
+      if (e is ServerException) rethrow;
+      throw NetworkException("Error de red: $e");
     }
   }
 }

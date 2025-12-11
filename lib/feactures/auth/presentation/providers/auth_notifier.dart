@@ -1,29 +1,15 @@
-// lib/feactures/auth/presentation/providers/auth_notifier.dart (SOLO LOGIN)
+// lib/feactures/auth/presentation/providers/auth_notifier.dart
 
 import 'package:flutter/foundation.dart';
 import 'package:redsocial/core/application/app_state.dart';
-import 'package:redsocial/feactures/auth/data/datasource/auth_remote_datasource.dart';
-import 'package:redsocial/feactures/auth/data/repository/auth_repository_impl.dart';
 import 'package:redsocial/feactures/auth/domain/entities/user.dart';
-import 'package:redsocial/feactures/auth/domain/usecase/login_usecase.dart';
 
 enum AuthStateStatus { initial, loading, success, error }
 
 class AuthNotifier extends ChangeNotifier {
   final AppState appState;
 
-  // Inicializar las dependencias dentro del notifier
-  late final LoginUseCase _loginUseCase;
-
-  AuthNotifier(this.appState) {
-    // Inyección de dependencias manual (patrón del profesor)
-    final authRemoteDataSource = AuthRemoteDataSourceImpl();
-    final authRepository = AuthRepositoryImpl(
-      authRemoteDataSource: authRemoteDataSource,
-    );
-    _loginUseCase = LoginUseCase(authRepository);
-    // [register_usecase] ELIMINADO
-  }
+  AuthNotifier(this.appState);
 
   AuthStateStatus _status = AuthStateStatus.initial;
   String? _errorMessage;
@@ -33,17 +19,35 @@ class AuthNotifier extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   User? get currentUser => _currentUser;
 
+  // ✨ LOGIN SIMULADO (acepta cualquier email/password)
   Future<void> login(String email, String password) async {
     _status = AuthStateStatus.loading;
     _errorMessage = null;
     notifyListeners();
 
+    // Simula delay de red
+    await Future.delayed(const Duration(seconds: 1));
+
     try {
-      // Llamar al use case
-      _currentUser = await _loginUseCase.call(email, password);
+      // ✨ VALIDACIÓN SIMPLE SIMULADA
+      if (email.isEmpty || !email.contains('@')) {
+        throw Exception('Email inválido');
+      }
+      if (password.isEmpty || password.length < 6) {
+        throw Exception('Contraseña debe tener al menos 6 caracteres');
+      }
+
+      // ✨ USUARIO SIMULADO
+      _currentUser = User(
+        id: '1',
+        name: 'Usuario Demo',
+        email: email,
+        avatar: null,
+        bio: 'Usuario de prueba',
+      );
 
       _status = AuthStateStatus.success;
-      appState.login();
+      appState.login(); // Cambia el estado de autenticación
       notifyListeners();
     } catch (e) {
       _status = AuthStateStatus.error;
@@ -51,8 +55,6 @@ class AuthNotifier extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  // MÉTODO register ELIMINADO
 
   void setUser(User user) {
     _currentUser = user;

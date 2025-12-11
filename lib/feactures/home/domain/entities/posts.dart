@@ -1,9 +1,17 @@
-// feactures/home/domain/entities/posts.dart
-
 class Posts {
-  final int id;
+  final String id;
   final String title;
-  final String body;
+  final String description;
+  final String imageUrl;
+  final String authorName;
+  final String? authorPhoto;
 
-  Posts({required this.id, required this.title, required this.body});
+  Posts({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.imageUrl,
+    required this.authorName,
+    this.authorPhoto,
+  });
 }

@@ -1,4 +1,7 @@
+// lib/feactures/auth/presentation/widgets/custom_button.dart
+
 import 'package:flutter/material.dart';
+import 'package:redsocial/theme/shapes.dart';
 
 enum ButtonType { primary, secondary, outlined }
 
@@ -22,7 +25,8 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     if (isLoading) {
       return SizedBox(
@@ -53,6 +57,9 @@ class CustomButton extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,
+              shape: RoundedRectangleBorder(
+                borderRadius: AppShapes.buttonBorderRadius,
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -64,10 +71,7 @@ class CustomButton extends StatelessWidget {
                 ],
                 Text(
                   text,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: theme.textTheme.labelLarge,
                 ),
               ],
             ),
@@ -83,6 +87,9 @@ class CustomButton extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.secondaryContainer,
               foregroundColor: colorScheme.onSecondaryContainer,
+              shape: RoundedRectangleBorder(
+                borderRadius: AppShapes.buttonBorderRadius,
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -94,10 +101,7 @@ class CustomButton extends StatelessWidget {
                 ],
                 Text(
                   text,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: theme.textTheme.labelLarge,
                 ),
               ],
             ),
@@ -114,7 +118,7 @@ class CustomButton extends StatelessWidget {
               foregroundColor: colorScheme.primary,
               side: BorderSide(color: colorScheme.outline, width: 1.5),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppShapes.buttonBorderRadius,
               ),
             ),
             child: Row(
@@ -127,10 +131,7 @@ class CustomButton extends StatelessWidget {
                 ],
                 Text(
                   text,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: theme.textTheme.labelLarge,
                 ),
               ],
             ),

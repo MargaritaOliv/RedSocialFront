@@ -1,24 +1,17 @@
-// feactures/home/data/models/posts_model.dart (CORREGIDO)
+class Posts {
+  final String id;
+  final String title;
+  final String description; // Este es el campo correcto, NO 'body'
+  final String imageUrl;
+  final String authorName;
+  final String? authorPhoto;
 
-import '../../domain/entities/posts.dart';
-
-class PostsModel extends Posts {
-  final int userId;
-
-  // Solución: Si usas required super.X, NO necesitas el inicializador ": super(X: X)"
-  PostsModel({
-    required this.userId,
-    required super.id,
-    required super.title,
-    required super.body
-  }); // <--- Se elimina el inicializador : super(...)
-
-  factory PostsModel.fromJson(Map<String, dynamic> json) {
-    return PostsModel(
-      userId: json['userId'],
-      id: json['id'],
-      title: json['title'],
-      body: json['body'],
-    );
-  }
+  Posts({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.imageUrl,
+    required this.authorName,
+    this.authorPhoto,
+  });
 }

@@ -1,29 +1,17 @@
-// feactures/create_post/presentation/providers/create_post_notifier.dart
+// lib/feactures/create_post/presentation/providers/create_post_notifier.dart
 
 import 'package:flutter/material.dart';
-import 'package:redsocial/core/error/exception.dart'; // Para manejar errores específicos
-import 'package:redsocial/feactures/create_post/domain/usecase/create_new_post_usecase.dart';
-import 'package:redsocial/feactures/create_post/data/datasource/create_post_remote_datasource.dart';
-import 'package:redsocial/feactures/create_post/data/repository/create_post_repository_impl.dart';
 
 enum CreatePostStatus { initial, loading, success, error }
 
 class CreatePostNotifier extends ChangeNotifier {
-  late final CreateNewPostUseCase _useCase;
-
-  CreatePostNotifier() {
-    // Inyección de dependencias manual
-    final dataSource = CreatePostRemoteDataSourceImpl();
-    final repository = CreatePostRepositoryImpl(remoteDataSource: dataSource);
-    _useCase = CreateNewPostUseCase(repository);
-  }
-
   CreatePostStatus _status = CreatePostStatus.initial;
   String? _errorMessage;
 
   CreatePostStatus get status => _status;
   String? get errorMessage => _errorMessage;
 
+  // ✨ SIMULACIÓN: Crear post fake
   Future<void> createPost({
     required String title,
     required String imageUrl,
@@ -34,28 +22,22 @@ class CreatePostNotifier extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
+    // Simula delay de red
+    await Future.delayed(const Duration(seconds: 2));
+
     try {
-      await _useCase.call(
-        title: title,
-        imageUrl: imageUrl,
-        category: category,
-        description: description,
-      );
+      // ✨ VALIDACIÓN SIMPLE
+      if (title.isEmpty) throw Exception('El título es requerido');
+      if (description.isEmpty) throw Exception('La descripción es requerida');
+
+      // ✨ ÉXITO SIMULADO
+      print('✅ Post creado: $title');
 
       _status = CreatePostStatus.success;
       notifyListeners();
-
-    } on ServerException catch (e) {
-      _status = CreatePostStatus.error;
-      _errorMessage = e.message;
-      notifyListeners();
-    } on NetworkException catch (e) {
-      _status = CreatePostStatus.error;
-      _errorMessage = e.message;
-      notifyListeners();
     } catch (e) {
       _status = CreatePostStatus.error;
-      _errorMessage = "Ocurrió un error inesperado.";
+      _errorMessage = e.toString();
       notifyListeners();
     }
   }

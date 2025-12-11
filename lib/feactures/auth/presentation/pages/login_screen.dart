@@ -1,10 +1,7 @@
-// lib/feactures/auth/presentation/pages/login_screen.dart (FINAL)
+// lib/feactures/auth/presentation/pages/login_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:redsocial/core/router/routes.dart';
-// Asumimos que CustomButton y CustomTextField están disponibles via import
 import 'package:redsocial/feactures/auth/presentation/widgets/custom_button.dart';
 import 'package:redsocial/feactures/auth/presentation/widgets/custom_text_field.dart';
 import '../providers/auth_notifier.dart';
@@ -66,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(authNotifier.errorMessage ?? 'Error al iniciar sesión'),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
     }
@@ -74,7 +71,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     final size = MediaQuery.of(context).size;
     final isSmallScreen = size.width < 600;
 
@@ -110,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Logo/Icono artístico
+                            // Logo
                             Hero(
                               tag: 'app_logo',
                               child: Container(
@@ -145,8 +144,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             Text(
                               'Bienvenido',
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: isSmallScreen ? 32 : 40,
+                              style: textTheme.displaySmall?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: colorScheme.onSurface,
                               ),
@@ -155,19 +153,18 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             Text(
                               'Comparte tu arte con el mundo',
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
+                              style: textTheme.bodyLarge?.copyWith(
                                 color: colorScheme.onSurface.withOpacity(0.6),
                               ),
                             ),
                             const SizedBox(height: 48),
 
                             // Campo Email
-                            _buildTextField(
+                            CustomTextField(
                               controller: _emailController,
                               label: 'Correo electrónico',
                               hint: 'ejemplo@correo.com',
-                              icon: Icons.email_outlined,
+                              prefixIcon: Icons.email_outlined,
                               keyboardType: TextInputType.emailAddress,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -182,10 +179,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             const SizedBox(height: 20),
 
                             // Campo Password
-                            _buildPasswordField(
+                            CustomTextField(
                               controller: _passwordController,
                               label: 'Contraseña',
                               hint: '••••••••',
+                              prefixIcon: Icons.lock_outline,
+                              isPassword: true,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Ingresa tu contraseña';
@@ -203,11 +202,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () {
-                                  // TODO: Implementar recuperación de contraseña
+                                  // TODO: Implementar recuperación
                                 },
                                 child: Text(
                                   '¿Olvidaste tu contraseña?',
-                                  style: TextStyle(
+                                  style: textTheme.labelLarge?.copyWith(
                                     color: colorScheme.primary,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -216,10 +215,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             ),
                             const SizedBox(height: 24),
 
-                            // Botón Login con Consumer
+                            // Botón Login
                             Consumer<AuthNotifier>(
                               builder: (context, authNotifier, child) {
-                                return _buildPrimaryButton(
+                                return CustomButton(
                                   text: 'Iniciar Sesión',
                                   onPressed: _handleLogin,
                                   isLoading: authNotifier.status == AuthStateStatus.loading,
@@ -228,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             ),
                             const SizedBox(height: 16),
 
-                            // Opcionales (Divider y Google Button)
+                            // Divider
                             Row(
                               children: [
                                 Expanded(child: Divider(color: colorScheme.outline)),
@@ -236,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   padding: const EdgeInsets.symmetric(horizontal: 16),
                                   child: Text(
                                     'o',
-                                    style: TextStyle(
+                                    style: textTheme.bodyMedium?.copyWith(
                                       color: colorScheme.onSurface.withOpacity(0.6),
                                     ),
                                   ),
@@ -246,30 +245,15 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             ),
                             const SizedBox(height: 16),
 
-                            _buildOutlinedButton(
+                            // Google Button
+                            CustomButton(
                               text: 'Continuar con Google',
                               icon: Icons.g_mobiledata,
+                              type: ButtonType.outlined,
                               onPressed: () {
-                                // TODO: Implementar login con Google
+                                // TODO: Implementar Google login
                               },
                             ),
-                            const SizedBox(height: 24),
-
-                            // ENLACE DE REGISTRO ELIMINADO:
-                            /*
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text('¿No tienes cuenta? '),
-                                TextButton(
-                                  onPressed: () {
-                                    context.goNamed(AppRoutes.register);
-                                  },
-                                  child: Text('Regístrate'),
-                                ),
-                              ],
-                            ),
-                            */
                           ],
                         ),
                       ),
@@ -278,161 +262,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Incluir los métodos auxiliares (asumiendo que los usaste en tu LoginScreen):
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-    String? Function(String?)? validator,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface.withOpacity(0.8),
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          validator: validator,
-          style: TextStyle(color: colorScheme.onSurface),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(
-              color: colorScheme.onSurface.withOpacity(0.4),
-            ),
-            prefixIcon: Icon(icon, color: colorScheme.primary),
-            fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPasswordField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    String? Function(String?)? validator,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    bool obscureText = true;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface.withOpacity(0.8),
-          ),
-        ),
-        const SizedBox(height: 8),
-        StatefulBuilder(
-          builder: (context, setState) {
-            return TextFormField(
-              controller: controller,
-              obscureText: obscureText,
-              validator: validator,
-              style: TextStyle(color: colorScheme.onSurface),
-              decoration: InputDecoration(
-                hintText: hint,
-                hintStyle: TextStyle(
-                  color: colorScheme.onSurface.withOpacity(0.4),
-                ),
-                prefixIcon: Icon(Icons.lock_outline, color: colorScheme.primary),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                    color: colorScheme.onSurface.withOpacity(0.6),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      obscureText = !obscureText;
-                    });
-                  },
-                ),
-                fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPrimaryButton({
-    required String text,
-    required VoidCallback onPressed,
-    bool isLoading = false,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return SizedBox(
-      height: 56,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
-          disabledBackgroundColor: colorScheme.primary.withOpacity(0.6),
-        ),
-        child: isLoading
-            ? SizedBox(
-          width: 24,
-          height: 24,
-          child: CircularProgressIndicator(
-            strokeWidth: 2.5,
-            valueColor: AlwaysStoppedAnimation<Color>(colorScheme.onPrimary),
-          ),
-        )
-            : Text(
-          text,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOutlinedButton({
-    required String text,
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return SizedBox(
-      height: 56,
-      child: OutlinedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon),
-        label: Text(text),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: colorScheme.onSurface,
-          side: BorderSide(color: colorScheme.outline, width: 1.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),

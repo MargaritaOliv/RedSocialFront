@@ -1,5 +1,3 @@
-// lib/feactures/auth/data/datasource/auth_remote_datasource.dart
-
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redsocial/core/network/http_client.dart';

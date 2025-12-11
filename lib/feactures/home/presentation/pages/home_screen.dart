@@ -1,10 +1,11 @@
-// feactures/home/presentation/pages/home_screen.dart
+// lib/feactures/home/presentation/pages/home_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:redsocial/feactures/home/domain/entities/posts.dart'; // Correcto
+import 'package:redsocial/feactures/home/domain/entities/posts.dart';
 import '../providers/posts_notifier.dart';
-import '../widgets/post_card.dart'; // Correcto
+import 'package:redsocial/feactures/home/presentation/providers/posts_notifier.dart';
+import '../widgets/post_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,7 +15,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -25,65 +25,138 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Red Social Feed'),
+        title: Text(
+          'Red Social Feed',
+          style: theme.textTheme.titleLarge,
+        ),
         centerTitle: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => context.read<PostsNotifier>().fetchPosts(),
+            tooltip: 'Actualizar',
           ),
-          // TODO: Ejemplo de botón de Logout
         ],
       ),
       body: Consumer<PostsNotifier>(
-        builder: (context, postsNotifier, child) {
-          switch (postsNotifier.status) {
+        builder: (context, notifier, child) {
+          switch (notifier.status) {
             case PostsStateStatus.loading:
-              return const Center(child: CircularProgressIndicator());
+              return Center(
+                child: CircularProgressIndicator(
+                  color: colorScheme.primary,
+                ),
+              );
 
             case PostsStateStatus.error:
               return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error_outline, size: 50, color: Colors.red),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Error al cargar posts: ${postsNotifier.errorMessage}',
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: postsNotifier.fetchPosts,
-                      child: const Text('Reintentar'),
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: colorScheme.error,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Oops! Algo salió mal',
+                        style: theme.textTheme.titleLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        notifier.errorMessage ?? 'Error desconocido',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () => notifier.fetchPosts(),
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Reintentar'),
+                      ),
+                    ],
+                  ),
                 ),
               );
 
             case PostsStateStatus.loaded:
-              return postsNotifier.posts.isEmpty
-                  ? const Center(child: Text('No hay publicaciones para mostrar.'))
-                  : _buildPostsList(postsNotifier.posts);
+              if (notifier.posts.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.inbox_outlined,
+                        size: 64,
+                        color: colorScheme.onSurface.withOpacity(0.3),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No hay publicaciones',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurface.withOpacity(0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return _buildPostsList(notifier.posts);
 
             case PostsStateStatus.initial:
             default:
-              return const Center(child: Text('Cargando datos iniciales...'));
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      color: colorScheme.primary,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Cargando datos...',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              );
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // TODO: Navegar a CreatePostScreen
+        },
+        tooltip: 'Crear publicación',
+        child: const Icon(Icons.add),
       ),
     );
   }
 
   Widget _buildPostsList(List<Posts> posts) {
-    return ListView.builder(
-      itemCount: posts.length,
-      itemBuilder: (context, index) {
-        final post = posts[index];
-        return PostCard(post: post);
-      },
+    return RefreshIndicator(
+      onRefresh: () => context.read<PostsNotifier>().fetchPosts(),
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: posts.length,
+        itemBuilder: (context, index) {
+          final post = posts[index];
+          return PostCard(post: post);
+        },
+      ),
     );
   }
 }

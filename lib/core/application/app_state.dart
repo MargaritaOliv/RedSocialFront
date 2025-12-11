@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum AuthStatus { unknown, authenticated, unauthenticated }
 
@@ -8,8 +9,16 @@ class AppState extends ChangeNotifier {
   AuthStatus get authStatus => _authStatus;
 
   Future<void> checkAuthStatus() async {
-    await Future.delayed(const Duration(seconds: 3));
-    _authStatus = AuthStatus.unauthenticated;
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (token != null && token.isNotEmpty) {
+      _authStatus = AuthStatus.authenticated;
+    } else {
+      _authStatus = AuthStatus.unauthenticated;
+    }
     notifyListeners();
   }
 

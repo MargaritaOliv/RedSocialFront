@@ -1,4 +1,7 @@
+// lib/feactures/auth/presentation/widgets/custom_text_field.dart
+
 import 'package:flutter/material.dart';
+import 'package:redsocial/theme/shapes.dart';
 
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
@@ -31,16 +34,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           widget.label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+          style: theme.textTheme.titleSmall?.copyWith(
             color: colorScheme.onSurface.withOpacity(0.8),
           ),
         ),
@@ -51,10 +53,12 @@ class _CustomTextFieldState extends State<CustomTextField> {
           keyboardType: widget.keyboardType,
           maxLines: widget.isPassword ? 1 : widget.maxLines,
           validator: widget.validator,
-          style: TextStyle(color: colorScheme.onSurface),
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
           decoration: InputDecoration(
             hintText: widget.hint,
-            hintStyle: TextStyle(
+            hintStyle: theme.textTheme.bodyLarge?.copyWith(
               color: colorScheme.onSurface.withOpacity(0.4),
             ),
             prefixIcon: Icon(
@@ -64,7 +68,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
             suffixIcon: widget.isPassword
                 ? IconButton(
               icon: Icon(
-                _obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                _obscureText
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
                 color: colorScheme.onSurface.withOpacity(0.6),
               ),
               onPressed: () {
@@ -74,7 +80,26 @@ class _CustomTextFieldState extends State<CustomTextField> {
               },
             )
                 : null,
+            filled: true,
             fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            border: OutlineInputBorder(
+              borderRadius: AppShapes.inputBorderRadius,
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: AppShapes.inputBorderRadius,
+              borderSide: BorderSide(
+                color: colorScheme.primary,
+                width: 2,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: AppShapes.inputBorderRadius,
+              borderSide: BorderSide(
+                color: colorScheme.error,
+                width: 1,
+              ),
+            ),
           ),
         ),
       ],

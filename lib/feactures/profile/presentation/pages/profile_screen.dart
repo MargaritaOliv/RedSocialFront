@@ -1,13 +1,14 @@
-// feactures/profile/presentation/pages/profile_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:redsocial/core/router/routes.dart';
 import '../providers/profile_notifier.dart';
-import '../widgets/profile_header.dart'; // Usaremos un widget para el encabezado
-import 'package:redsocial/feactures/home/presentation/widgets/post_card.dart'; // Reutilizamos PostCard
+import 'package:redsocial/feactures/auth/presentation/providers/auth_notifier.dart';
+import '../widgets/profile_header.dart';
+import 'package:redsocial/feactures/home/presentation/widgets/post_card.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final String userId; // Parámetro del GoRouter
+  final String userId;
   const ProfileScreen({super.key, required this.userId});
 
   @override
@@ -19,8 +20,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Nota: Si userId es el mismo que el usuario logueado, se llama a fetchProfileData().
-      // Si es otro usuario, necesitarías otro use case (fetchUserProfile(userId)).
       context.read<ProfileNotifier>().fetchProfileData();
     });
   }
@@ -29,12 +28,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Perfil de Usuario ${widget.userId == 'me' ? '' : widget.userId}'),
+        title: const Text('Mi Perfil'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar Sesión',
             onPressed: () {
-              // TODO: Llama a AuthNotifier para cerrar sesión
+              context.read<AuthNotifier>().logout();
+              context.goNamed(AppRoutes.login);
             },
           )
         ],
@@ -46,55 +47,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
               return const Center(child: CircularProgressIndicator());
 
             case ProfileStatus.error:
-              return Center(child: Text('Error: ${notifier.errorMessage}'));
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Error: ${notifier.errorMessage}'),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: notifier.fetchProfileData,
+                      child: const Text('Reintentar'),
+                    )
+                  ],
+                ),
+              );
 
             case ProfileStatus.loaded:
               if (notifier.user == null) {
-                return const Center(child: Text('No se encontraron datos de perfil.'));
+                return const Center(child: Text('No se encontraron datos.'));
               }
-              return _buildProfileContent(notifier);
+              return RefreshIndicator(
+                onRefresh: () => notifier.fetchProfileData(),
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: ProfileHeader(user: notifier.user!),
+                    ),
+
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                        child: Text(
+                          'Mis Publicaciones (${notifier.posts.length})',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                    ),
+
+                    notifier.posts.isEmpty
+                        ? const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.all(32.0),
+                        child: Center(
+                          child: Text('Aún no has publicado nada.'),
+                        ),
+                      ),
+                    )
+                        : SliverList.builder(
+                      itemCount: notifier.posts.length,
+                      itemBuilder: (context, index) {
+                        return PostCard(post: notifier.posts[index]);
+                      },
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 40)),
+                  ],
+                ),
+              );
 
             default:
               return const SizedBox.shrink();
           }
         },
       ),
-    );
-  }
-
-  Widget _buildProfileContent(ProfileNotifier notifier) {
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: ProfileHeader(user: notifier.user!),
-        ),
-
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-            child: Text(
-              'Mis Publicaciones (${notifier.posts.length})',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ),
-        ),
-
-        notifier.posts.isEmpty
-            ? const SliverToBoxAdapter(
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.all(32.0),
-              child: Text('No has realizado ninguna publicación.'),
-            ),
-          ),
-        )
-            : SliverList.builder(
-          itemCount: notifier.posts.length,
-          itemBuilder: (context, index) {
-            return PostCard(post: notifier.posts[index]);
-          },
-        ),
-      ],
     );
   }
 }

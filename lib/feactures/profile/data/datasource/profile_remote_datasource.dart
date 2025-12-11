@@ -1,11 +1,10 @@
-// feactures/profile/data/datasource/profile_remote_datasource.dart
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redsocial/core/network/http_client.dart';
 import 'package:redsocial/core/error/exception.dart';
-import 'package:redsocial/feactures/home/data/models/posts_model.dart'; // Para las publicaciones
+import 'package:redsocial/feactures/home/data/models/posts_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_profile_model.dart';
 
 abstract class ProfileRemoteDataSource {
@@ -21,56 +20,62 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
   String get baseUrl => dotenv.env['API_URL'] ?? 'http://localhost:3000';
 
-  // TODO: Implementar la obtención segura del Token de Auth
-  final String dummyToken = 'YOUR_AUTH_TOKEN_FROM_STORAGE';
+  Future<Map<String, String>> _getHeaders() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      throw ServerException("Debes iniciar sesión.");
+    }
+
+    return {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    };
+  }
 
   @override
   Future<UserProfileModel> fetchMyProfile() async {
-    // Endpoint: GET http://localhost:3000/api/users/me
+
     final url = Uri.parse('$baseUrl/api/users/me');
 
     try {
       final response = await client.get(
         url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $dummyToken",
-        },
+        headers: await _getHeaders(),
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> decoded = json.decode(response.body);
-        return UserProfileModel.fromJson(decoded['user'] ?? decoded);
+        final dynamic decoded = json.decode(response.body);
+        return UserProfileModel.fromJson(decoded);
       } else {
-        throw ServerException("Error al obtener perfil. Código: ${response.statusCode}");
+        throw ServerException("Error al cargar perfil: ${response.statusCode}");
       }
     } catch (e) {
-      throw NetworkException("Error de red al obtener perfil: $e");
+      if (e is ServerException) rethrow;
+      throw NetworkException("Error de red: $e");
     }
   }
 
   @override
   Future<List<PostsModel>> fetchMyPosts() async {
-    // Endpoint: GET http://localhost:3000/api/users/me/posts
     final url = Uri.parse('$baseUrl/api/users/me/posts');
 
     try {
       final response = await client.get(
         url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $dummyToken",
-        },
+        headers: await _getHeaders(),
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> decoded = json.decode(response.body);
         return decoded.map((e) => PostsModel.fromJson(e)).toList();
       } else {
-        throw ServerException("Error al obtener posts. Código: ${response.statusCode}");
+        throw ServerException("Error al cargar mis posts: ${response.statusCode}");
       }
     } catch (e) {
-      throw NetworkException("Error de red al obtener posts: $e");
+      if (e is ServerException) rethrow;
+      throw NetworkException("Error de red: $e");
     }
   }
 }
