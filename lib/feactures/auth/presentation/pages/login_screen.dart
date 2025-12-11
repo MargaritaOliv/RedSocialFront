@@ -1,7 +1,8 @@
-// lib/feactures/auth/presentation/pages/login_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart'; // Importante para la navegación
+import 'package:redsocial/core/router/routes.dart'; // Para AppRoutes
+
 import 'package:redsocial/feactures/auth/presentation/widgets/custom_button.dart';
 import 'package:redsocial/feactures/auth/presentation/widgets/custom_text_field.dart';
 import '../providers/auth_notifier.dart';
@@ -17,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -24,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
+    // Animaciones de entrada
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -50,15 +53,18 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   }
 
   Future<void> _handleLogin() async {
+    // Validar formulario
     if (!_formKey.currentState!.validate()) return;
 
     final authNotifier = context.read<AuthNotifier>();
 
+    // Llamada al Provider (que ahora llama a la API real)
     await authNotifier.login(
       _emailController.text.trim(),
       _passwordController.text,
     );
 
+    // Manejo de errores visuales
     if (mounted && authNotifier.status == AuthStateStatus.error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -67,6 +73,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         ),
       );
     }
+    // Nota: Si es exitoso, el AppRouter redirecciona automáticamente al Home
+    // gracias al listener en AppState.
   }
 
   @override
@@ -109,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Logo
+                            // --- LOGO ---
                             Hero(
                               tag: 'app_logo',
                               child: Container(
@@ -140,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             ),
                             const SizedBox(height: 32),
 
-                            // Título
+                            // --- TÍTULO ---
                             Text(
                               'Bienvenido',
                               textAlign: TextAlign.center,
@@ -159,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             ),
                             const SizedBox(height: 48),
 
-                            // Campo Email
+                            // --- CAMPO EMAIL ---
                             CustomTextField(
                               controller: _emailController,
                               label: 'Correo electrónico',
@@ -178,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             ),
                             const SizedBox(height: 20),
 
-                            // Campo Password
+                            // --- CAMPO PASSWORD ---
                             CustomTextField(
                               controller: _passwordController,
                               label: 'Contraseña',
@@ -197,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             ),
                             const SizedBox(height: 12),
 
-                            // Olvidé mi contraseña
+                            // --- OLVIDÉ CONTRASEÑA ---
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
@@ -215,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             ),
                             const SizedBox(height: 24),
 
-                            // Botón Login
+                            // --- BOTÓN LOGIN ---
                             Consumer<AuthNotifier>(
                               builder: (context, authNotifier, child) {
                                 return CustomButton(
@@ -225,17 +233,43 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 );
                               },
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 24),
 
-                            // Divider
+                            // --- IR AL REGISTRO (NUEVO) ---
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '¿No tienes cuenta? ',
+                                  style: textTheme.bodyMedium,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    // Navegar a RegisterScreen
+                                    context.pushNamed(AppRoutes.register);
+                                  },
+                                  child: Text(
+                                    'Regístrate',
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 30),
+
+                            // --- DIVIDER (Opcional) ---
                             Row(
                               children: [
                                 Expanded(child: Divider(color: colorScheme.outline)),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 16),
                                   child: Text(
-                                    'o',
-                                    style: textTheme.bodyMedium?.copyWith(
+                                    'o continúa con',
+                                    style: textTheme.bodySmall?.copyWith(
                                       color: colorScheme.onSurface.withOpacity(0.6),
                                     ),
                                   ),
@@ -243,11 +277,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 Expanded(child: Divider(color: colorScheme.outline)),
                               ],
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 20),
 
-                            // Google Button
+                            // --- GOOGLE BUTTON (Opcional) ---
                             CustomButton(
-                              text: 'Continuar con Google',
+                              text: 'Google',
                               icon: Icons.g_mobiledata,
                               type: ButtonType.outlined,
                               onPressed: () {

@@ -5,20 +5,38 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.2
+  # Ajustado para compatibilidad con las librerías actuales
+  sdk: '>=3.5.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
+  # Iconos de estilo iOS
   cupertino_icons: ^1.0.8
+
+  # Gestión de estado
   provider: ^6.1.0
+
+  # Navegación
   go_router: ^14.0.0
+
+  # Peticiones HTTP
   http: ^1.1.0
+
+  # Variables de entorno
   flutter_dotenv: ^5.1.0
+
+  # Previsualización en varios dispositivos
   device_preview: ^1.1.0
+
+  # Formato de fechas (ej: "hace 5 minutos")
   timeago: ^3.6.1
+
+  # Comparación de objetos
   equatable: ^2.0.5
+
+  # Almacenamiento local (Token)
   shared_preferences: ^2.5.1
 
 dev_dependencies:
@@ -29,3 +47,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # --- AQUÍ ESTABA EL ERROR DEL .ENV ---
+  # Debes declarar explícitamente el archivo para que Flutter lo incl

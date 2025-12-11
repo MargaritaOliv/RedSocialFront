@@ -1,17 +1,19 @@
-// lib/feactures/create_post/presentation/providers/create_post_notifier.dart
-
 import 'package:flutter/material.dart';
+import 'package:redsocial/feactures/create_post/domain/usecase/create_new_post_usecase.dart';
 
 enum CreatePostStatus { initial, loading, success, error }
 
 class CreatePostNotifier extends ChangeNotifier {
+  final CreateNewPostUseCase createNewPostUseCase; // Inyección
+
+  CreatePostNotifier({required this.createNewPostUseCase});
+
   CreatePostStatus _status = CreatePostStatus.initial;
   String? _errorMessage;
 
   CreatePostStatus get status => _status;
   String? get errorMessage => _errorMessage;
 
-  // ✨ SIMULACIÓN: Crear post fake
   Future<void> createPost({
     required String title,
     required String imageUrl,
@@ -22,22 +24,20 @@ class CreatePostNotifier extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    // Simula delay de red
-    await Future.delayed(const Duration(seconds: 2));
-
     try {
-      // ✨ VALIDACIÓN SIMPLE
-      if (title.isEmpty) throw Exception('El título es requerido');
-      if (description.isEmpty) throw Exception('La descripción es requerida');
-
-      // ✨ ÉXITO SIMULADO
-      print('✅ Post creado: $title');
+      // LLAMADA REAL
+      await createNewPostUseCase.call(
+        title: title,
+        imageUrl: imageUrl,
+        category: category,
+        description: description,
+      );
 
       _status = CreatePostStatus.success;
       notifyListeners();
     } catch (e) {
       _status = CreatePostStatus.error;
-      _errorMessage = e.toString();
+      _errorMessage = e.toString().replaceAll('Exception:', '').trim();
       notifyListeners();
     }
   }

@@ -18,7 +18,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   AuthRemoteDataSourceImpl({http.Client? client})
       : client = client ?? HttpClient().client;
 
-  // Obtener la URL base desde .env
+  // Obtener la URL base desde ..env
   String get baseUrl => dotenv.env['API_URL'] ?? 'http://localhost:3000';
 
   @override

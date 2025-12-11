@@ -1,5 +1,3 @@
-// lib/feactures/post_detail/presentation/widgets/post_content.dart
-
 import 'package:flutter/material.dart';
 import 'package:redsocial/feactures/home/domain/entities/posts.dart';
 import 'package:redsocial/theme/shapes.dart';
@@ -25,11 +23,16 @@ class PostContent extends StatelessWidget {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: colorScheme.primaryContainer,
-                child: Icon(
+                backgroundImage: post.authorPhoto != null
+                    ? NetworkImage(post.authorPhoto!)
+                    : null,
+                child: post.authorPhoto == null
+                    ? Icon(
                   Icons.person,
                   color: colorScheme.onPrimaryContainer,
                   size: 28,
-                ),
+                )
+                    : null,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -37,13 +40,13 @@ class PostContent extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Usuario #${post.id}',
+                      post.authorName, // Usamos el nombre real del autor
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      'Hace 2 horas',
+                      'Publicado recientemente', // O fecha real si la tuvieras
                       style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurface.withOpacity(0.6),
                       ),
@@ -72,35 +75,45 @@ class PostContent extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Imagen simulada (opcional)
-          Container(
-            width: double.infinity,
-            height: 240,
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceVariant,
-              borderRadius: AppShapes.cardBorderRadius,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  colorScheme.primary.withOpacity(0.3),
-                  colorScheme.secondary.withOpacity(0.3),
-                ],
+          // Imagen
+          ClipRRect(
+            borderRadius: AppShapes.cardBorderRadius,
+            child: Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(minHeight: 200, maxHeight: 400),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
               ),
-            ),
-            child: Center(
-              child: Icon(
-                Icons.image_outlined,
-                size: 64,
-                color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+              child: Image.network(
+                post.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.broken_image_outlined,
+                          size: 48,
+                          color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'No se pudo cargar la imagen',
+                          style: TextStyle(color: colorScheme.onSurfaceVariant),
+                        )
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ),
           const SizedBox(height: 16),
 
-          // Cuerpo
+          // Cuerpo (CORREGIDO: post.description en lugar de post.body)
           Text(
-            post.body,
+            post.description,
             style: textTheme.bodyLarge?.copyWith(
               height: 1.6,
               color: colorScheme.onSurface,
