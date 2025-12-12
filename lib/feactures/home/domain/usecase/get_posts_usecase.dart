@@ -1,5 +1,3 @@
-// feactures/home/domain/usecase/get_posts_usecase.dart
-
 import '../entities/posts.dart';
 import '../repository/posts_repository.dart';
 

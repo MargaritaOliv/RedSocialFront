@@ -1,5 +1,3 @@
-// feactures/create_post/domain/entities/create_post_params.dart
-
 import 'package:equatable/equatable.dart';
 
 class CreatePostParams extends Equatable {

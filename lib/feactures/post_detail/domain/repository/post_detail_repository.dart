@@ -1,4 +1,3 @@
-// feactures/post_detail/domain/repository/post_detail_repository.dart
 
 import 'package:redsocial/feactures/home/domain/entities/posts.dart';
 import '../entities/comment.dart';

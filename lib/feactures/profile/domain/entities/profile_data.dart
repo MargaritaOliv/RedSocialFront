@@ -1,5 +1,3 @@
-// feactures/profile/domain/entities/profile_data.dart
-
 import 'package:redsocial/feactures/auth/domain/entities/user.dart';
 import 'package:redsocial/feactures/home/domain/entities/posts.dart';
 

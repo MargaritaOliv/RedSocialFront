@@ -1,5 +1,3 @@
-// feactures/create_post/domain/usecase/create_new_post_usecase.dart
-
 import '../repository/create_post_repository.dart';
 
 

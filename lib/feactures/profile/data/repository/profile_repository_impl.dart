@@ -1,5 +1,3 @@
-// feactures/profile/data/repository/profile_repository_impl.dart
-
 import 'package:redsocial/feactures/auth/domain/entities/user.dart';
 import 'package:redsocial/feactures/home/domain/entities/posts.dart';
 import '../../domain/repository/profile_repository.dart';
@@ -18,5 +16,10 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<List<Posts>> getMyPosts() async {
     return await remoteDataSource.fetchMyPosts();
+  }
+
+  @override
+  Future<User> updateProfile(String name, String bio, String profilePic) {
+    return remoteDataSource.updateProfile(name, bio, profilePic);
   }
 }

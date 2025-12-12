@@ -4,6 +4,8 @@ class User {
   final String email;
   final String? avatar;
   final String? bio;
+  final List<String> followers;
+  final List<String> following;
 
   User({
     required this.id,
@@ -11,5 +13,7 @@ class User {
     required this.email,
     this.avatar,
     this.bio,
+    this.followers = const [],
+    this.following = const [],
   });
 }

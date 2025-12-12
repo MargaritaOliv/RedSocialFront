@@ -4,7 +4,7 @@ import 'package:redsocial/feactures/create_post/domain/usecase/create_new_post_u
 enum CreatePostStatus { initial, loading, success, error }
 
 class CreatePostNotifier extends ChangeNotifier {
-  final CreateNewPostUseCase createNewPostUseCase; // Inyección
+  final CreateNewPostUseCase createNewPostUseCase;
 
   CreatePostNotifier({required this.createNewPostUseCase});
 
@@ -20,22 +20,23 @@ class CreatePostNotifier extends ChangeNotifier {
     required String category,
     required String description,
   }) async {
+    print('📢 [Notifier] createPost iniciado...');
     _status = CreatePostStatus.loading;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      // LLAMADA REAL
       await createNewPostUseCase.call(
         title: title,
         imageUrl: imageUrl,
         category: category,
         description: description,
       );
-
+      print('✅ [Notifier] Success');
       _status = CreatePostStatus.success;
       notifyListeners();
     } catch (e) {
+      print('❌ [Notifier] Error: $e');
       _status = CreatePostStatus.error;
       _errorMessage = e.toString().replaceAll('Exception:', '').trim();
       notifyListeners();

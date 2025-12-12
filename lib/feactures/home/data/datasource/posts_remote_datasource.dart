@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redsocial/core/network/http_client.dart';
 import 'package:redsocial/core/error/exception.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,11 +11,11 @@ abstract class PostsRemoteDataSource {
 
 class PostsRemoteDataSourceImpl implements PostsRemoteDataSource {
   final http.Client client;
+  final String baseUrl;
 
-  PostsRemoteDataSourceImpl({http.Client? client})
-      : client = client ?? HttpClient().client;
-
-  String get baseUrl => dotenv.env['API_URL'] ?? 'http://localhost:3000';
+  PostsRemoteDataSourceImpl({HttpClient? httpClient})
+      : client = (httpClient ?? HttpClient()).client,
+        baseUrl = (httpClient ?? HttpClient()).baseUrl;
 
   Future<Map<String, String>> _getHeaders() async {
     final prefs = await SharedPreferences.getInstance();
@@ -32,10 +31,9 @@ class PostsRemoteDataSourceImpl implements PostsRemoteDataSource {
     };
   }
 
-
   @override
   Future<List<PostsModel>> fetchPosts() async {
-    final url = Uri.parse('$baseUrl/api/posts/feed');
+    final url = Uri.parse('$baseUrl/posts/feed');
 
     try {
       final response = await client.get(

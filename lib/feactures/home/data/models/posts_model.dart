@@ -8,30 +8,41 @@ class PostsModel extends Posts {
     required super.imageUrl,
     required super.authorName,
     super.authorPhoto,
+    super.likes,
   });
 
   factory PostsModel.fromJson(Map<String, dynamic> json) {
+    final artistObj = json['artist'];
+    String name = 'Anónimo';
+    String? photo;
+
+    if (artistObj is Map<String, dynamic>) {
+      name = artistObj['name'] ?? 'Anónimo';
+      photo = artistObj['profilePic'];
+    }
+
     return PostsModel(
-      // Convertimos a String por seguridad, ya que a veces las APIs mandan int
-      id: json['id'].toString(),
+      id: json['_id']?.toString() ?? '',
       title: json['title'] ?? 'Sin título',
-      // Tu API puede mandar 'description' o 'body', ajusta según tu backend.
-      // Aquí asumo que viene en 'description' o 'body'.
-      description: json['description'] ?? json['body'] ?? '',
+      description: json['description'] ?? '',
       imageUrl: json['imageUrl'] ?? 'https://via.placeholder.com/300',
-      authorName: json['authorName'] ?? json['user']?['name'] ?? 'Anónimo',
-      authorPhoto: json['authorPhoto'] ?? json['user']?['avatar'],
+      authorName: name,
+      authorPhoto: photo,
+      likes: (json['likes'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList() ??
+          [],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      '_id': id,
       'title': title,
       'description': description,
       'imageUrl': imageUrl,
-      'authorName': authorName,
-      'authorPhoto': authorPhoto,
+      'artist': authorName,
+      'likes': likes,
     };
   }
 }

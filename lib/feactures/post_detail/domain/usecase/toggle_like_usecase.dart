@@ -1,5 +1,3 @@
-// feactures/post_detail/domain/usecase/toggle_like_usecase.dart
-
 import '../repository/post_detail_repository.dart';
 
 class ToggleLikeUseCase {

@@ -1,4 +1,3 @@
-// feactures/post_detail/domain/usecase/add_comment_usecase.dart
 
 import '../entities/comment.dart';
 import '../repository/post_detail_repository.dart';

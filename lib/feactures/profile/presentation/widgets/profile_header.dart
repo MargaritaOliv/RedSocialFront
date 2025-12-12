@@ -1,12 +1,14 @@
-// lib/feactures/profile/presentation/widgets/profile_header.dart
-
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:redsocial/core/router/routes.dart'; // Importante para la ruta
 import 'package:redsocial/feactures/auth/domain/entities/user.dart';
 import 'package:redsocial/theme/shapes.dart';
 
 class ProfileHeader extends StatelessWidget {
+  final int postCount;
   final User user;
-  const ProfileHeader({super.key, required this.user});
+  const ProfileHeader({super.key,
+    required this.user, required this.postCount,});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,7 @@ class ProfileHeader extends StatelessWidget {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            // Imagen de Perfil
+
             Stack(
               children: [
                 Container(
@@ -46,7 +48,8 @@ class ProfileHeader extends StatelessWidget {
                   child: CircleAvatar(
                     radius: 60,
                     backgroundColor: colorScheme.primaryContainer,
-                    backgroundImage: user.avatar != null && user.avatar!.isNotEmpty
+                    backgroundImage:
+                    user.avatar != null && user.avatar!.isNotEmpty
                         ? NetworkImage(user.avatar!)
                         : null,
                     child: user.avatar == null || user.avatar!.isEmpty
@@ -58,7 +61,6 @@ class ProfileHeader extends StatelessWidget {
                         : null,
                   ),
                 ),
-                // Badge de verificación (opcional)
                 Positioned(
                   bottom: 4,
                   right: 4,
@@ -83,7 +85,6 @@ class ProfileHeader extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Nombre de Usuario
             Text(
               user.name,
               style: textTheme.headlineMedium?.copyWith(
@@ -114,7 +115,6 @@ class ProfileHeader extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Biografía
             if (user.bio != null && user.bio!.isNotEmpty)
               Container(
                 padding: const EdgeInsets.all(16),
@@ -134,13 +134,12 @@ class ProfileHeader extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Estadísticas (opcional)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _StatItem(
                   label: 'Publicaciones',
-                  value: '0',
+                  value: postCount.toString(),
                   icon: Icons.article_outlined,
                 ),
                 Container(
@@ -150,7 +149,7 @@ class ProfileHeader extends StatelessWidget {
                 ),
                 _StatItem(
                   label: 'Seguidores',
-                  value: '0',
+                  value: user.followers.length.toString(),
                   icon: Icons.people_outline,
                 ),
                 Container(
@@ -160,7 +159,7 @@ class ProfileHeader extends StatelessWidget {
                 ),
                 _StatItem(
                   label: 'Siguiendo',
-                  value: '0',
+                  value: user.following.length.toString(),
                   icon: Icons.person_add_outlined,
                 ),
               ],
@@ -168,13 +167,14 @@ class ProfileHeader extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Botones de acción
+
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      // TODO: Navegar a editar perfil
+
+                      context.pushNamed(AppRoutes.editProfile);
                     },
                     icon: const Icon(Icons.edit_outlined),
                     label: const Text('Editar Perfil'),
@@ -192,7 +192,7 @@ class ProfileHeader extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      // TODO: Compartir perfil
+
                     },
                     icon: const Icon(Icons.share_outlined),
                     label: const Text('Compartir'),
@@ -213,23 +213,19 @@ class ProfileHeader extends StatelessWidget {
   }
 }
 
-// Widget para las estadísticas
 class _StatItem extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
-
   const _StatItem({
     required this.label,
     required this.value,
     required this.icon,
   });
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
     return Column(
       children: [
         Icon(

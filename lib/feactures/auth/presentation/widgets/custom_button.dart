@@ -1,5 +1,3 @@
-// lib/feactures/auth/presentation/widgets/custom_button.dart
-
 import 'package:flutter/material.dart';
 import 'package:redsocial/theme/shapes.dart';
 

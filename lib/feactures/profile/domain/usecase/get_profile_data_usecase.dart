@@ -1,8 +1,5 @@
-// feactures/profile/domain/usecase/get_profile_data_usecase.dart (CORREGIDO)
-
 import '../entities/profile_data.dart';
 import '../repository/profile_repository.dart';
-// 💡 SOLUCIÓN: Importar las entidades User y Posts
 import 'package:redsocial/feactures/auth/domain/entities/user.dart';
 import 'package:redsocial/feactures/home/domain/entities/posts.dart';
 

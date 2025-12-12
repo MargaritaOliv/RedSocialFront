@@ -1,5 +1,3 @@
-// feactures/create_post/data/repository/create_post_repository_impl.dart
-
 import '../../domain/repository/create_post_repository.dart';
 import '../datasource/create_post_remote_datasource.dart';
 import '../models/create_post_request_model.dart';

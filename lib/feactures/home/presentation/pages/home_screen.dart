@@ -1,9 +1,8 @@
-// lib/feactures/home/presentation/pages/home_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:redsocial/core/router/routes.dart';
 import 'package:redsocial/feactures/home/domain/entities/posts.dart';
-import '../providers/posts_notifier.dart';
 import 'package:redsocial/feactures/home/presentation/providers/posts_notifier.dart';
 import '../widgets/post_card.dart';
 
@@ -41,6 +40,18 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => context.read<PostsNotifier>().fetchPosts(),
             tooltip: 'Actualizar',
           ),
+
+          IconButton(
+            icon: const Icon(Icons.person_outline),
+            tooltip: 'Mi Perfil',
+            onPressed: () {
+              context.pushNamed(
+                AppRoutes.profile,
+                pathParameters: {'id': 'me'},
+              );
+            },
+          ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Consumer<PostsNotifier>(
@@ -138,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Navegar a CreatePostScreen
+          context.pushNamed(AppRoutes.createPost);
         },
         tooltip: 'Crear publicación',
         child: const Icon(Icons.add),

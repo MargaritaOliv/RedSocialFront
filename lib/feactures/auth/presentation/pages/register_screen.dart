@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:redsocial/core/router/routes.dart';
 import 'package:redsocial/feactures/auth/presentation/widgets/custom_button.dart';
 import 'package:redsocial/feactures/auth/presentation/widgets/custom_text_field.dart';
 import '../providers/auth_notifier.dart';
@@ -30,6 +29,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
+    FocusScope.of(context).unfocus();
+
     final authNotifier = context.read<AuthNotifier>();
 
     await authNotifier.register(
@@ -38,7 +39,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _passwordController.text,
     );
 
-    if (mounted && authNotifier.status == AuthStateStatus.error) {
+    if (!mounted) return;
+
+    if (authNotifier.status == AuthStateStatus.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Registro exitoso. Por favor inicia sesión.'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+
+      context.pop();
+
+    } else if (authNotifier.status == AuthStateStatus.error) {
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(authNotifier.errorMessage ?? 'Error al registrarse'),
@@ -46,13 +62,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       );
     }
-    // Si es success, el AppRouter redirigirá automáticamente al Home
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -132,7 +146,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 32),
 
-                    // Botón Registro
                     Consumer<AuthNotifier>(
                       builder: (context, authNotifier, child) {
                         return CustomButton(

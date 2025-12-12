@@ -1,5 +1,3 @@
-// feactures/home/data/repository/posts_repository_impl.dart
-
 import '../../domain/entities/posts.dart';
 import '../../domain/repository/posts_repository.dart';
 import '../datasource/posts_remote_datasource.dart';

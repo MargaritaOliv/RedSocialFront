@@ -1,5 +1,3 @@
-// lib/feactures/post_detail/presentation/widgets/comment_section.dart
-
 import 'package:flutter/material.dart';
 import 'package:redsocial/feactures/post_detail/domain/entities/comment.dart';
 import 'package:redsocial/theme/shapes.dart';
@@ -35,7 +33,6 @@ class _CommentSectionState extends State<CommentSection> {
     if (text.isEmpty) return;
 
     setState(() => _isSubmitting = true);
-
     await widget.addCommentCallback(widget.postId, text);
 
     if (mounted) {
@@ -56,7 +53,6 @@ class _CommentSectionState extends State<CommentSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Título
           Text(
             'Comentarios (${widget.comments.length})',
             style: textTheme.titleLarge?.copyWith(
@@ -64,8 +60,6 @@ class _CommentSectionState extends State<CommentSection> {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Campo para añadir comentario
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -123,8 +117,6 @@ class _CommentSectionState extends State<CommentSection> {
             ),
           ),
           const SizedBox(height: 20),
-
-          // Lista de Comentarios
           if (widget.comments.isEmpty)
             Center(
               child: Padding(
@@ -166,11 +158,18 @@ class _CommentSectionState extends State<CommentSection> {
                       CircleAvatar(
                         radius: 18,
                         backgroundColor: colorScheme.secondaryContainer,
-                        child: Icon(
+                        backgroundImage: comment.userAvatar != null &&
+                            comment.userAvatar!.isNotEmpty
+                            ? NetworkImage(comment.userAvatar!)
+                            : null,
+                        child: comment.userAvatar == null ||
+                            comment.userAvatar!.isEmpty
+                            ? Icon(
                           Icons.person_outline,
                           size: 20,
                           color: colorScheme.onSecondaryContainer,
-                        ),
+                        )
+                            : null,
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -178,7 +177,7 @@ class _CommentSectionState extends State<CommentSection> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Usuario ${comment.userId}',
+                              comment.userName,
                               style: textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -188,13 +187,6 @@ class _CommentSectionState extends State<CommentSection> {
                               comment.text,
                               style: textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Hace unos momentos',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurface.withOpacity(0.5),
                               ),
                             ),
                           ],

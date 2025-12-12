@@ -1,12 +1,9 @@
-// lib/core/theme/app_theme.dart
-
 import 'package:flutter/material.dart';
 import 'color_schemes.dart';
 import 'typography.dart';
 import 'shapes.dart';
 
 class AppTheme {
-  // 🌞 Tema claro
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -14,7 +11,6 @@ class AppTheme {
       textTheme: AppTypography.textTheme,
       fontFamily: 'Inter',
 
-      // Botones elevados
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
@@ -25,7 +21,6 @@ class AppTheme {
         ),
       ),
 
-      // Campos de texto
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColorSchemes.lightColorScheme.surfaceContainerHighest,
@@ -49,7 +44,6 @@ class AppTheme {
         ),
       ),
 
-      // Tarjetas
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -57,7 +51,6 @@ class AppTheme {
         ),
       ),
 
-      // AppBar
       appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
@@ -67,7 +60,6 @@ class AppTheme {
     );
   }
 
-  // 🌚 Tema oscuro
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
@@ -75,7 +67,6 @@ class AppTheme {
       textTheme: AppTypography.textTheme,
       fontFamily: 'Inter',
 
-      // Botones elevados
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
@@ -86,7 +77,6 @@ class AppTheme {
         ),
       ),
 
-      // Campos de texto
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColorSchemes.darkColorScheme.surfaceContainerHighest,
@@ -110,7 +100,6 @@ class AppTheme {
         ),
       ),
 
-      // Tarjetas
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(

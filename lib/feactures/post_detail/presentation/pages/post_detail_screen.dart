@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:redsocial/feactures/auth/presentation/widgets/custom_text_field.dart';
 import '../providers/post_detail_notifier.dart';
 import '../widgets/comment_section.dart';
 import '../widgets/post_content.dart';
@@ -18,7 +17,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Cargar los detalles apenas se abra la pantalla
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PostDetailNotifier>().fetchPostDetail(widget.postId);
     });
@@ -69,10 +67,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Contenido del Post (Imagen, Título, Descripción)
           PostContent(post: notifier.post!),
 
-          // 2. Barra de Acciones (Like)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
@@ -91,14 +87,12 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           ),
           const Divider(),
 
-          // 3. Sección de Comentarios
           CommentSection(
             postId: widget.postId,
             comments: notifier.comments,
             addCommentCallback: notifier.addComment,
           ),
 
-          // Espacio extra al final para que no se tape con el teclado
           const SizedBox(height: 40),
         ],
       ),

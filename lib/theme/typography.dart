@@ -1,10 +1,8 @@
-// lib/core/theme/typography.dart
-
 import 'package:flutter/material.dart';
 
 class AppTypography {
   static const TextTheme textTheme = TextTheme(
-    // Display styles
+
     displayLarge: TextStyle(
       fontSize: 57,
       fontWeight: FontWeight.w400,
@@ -19,7 +17,6 @@ class AppTypography {
       fontWeight: FontWeight.w400,
     ),
 
-    // Headline styles
     headlineLarge: TextStyle(
       fontSize: 32,
       fontWeight: FontWeight.w600,
@@ -33,7 +30,6 @@ class AppTypography {
       fontWeight: FontWeight.w600,
     ),
 
-    // Title styles
     titleLarge: TextStyle(
       fontSize: 22,
       fontWeight: FontWeight.w600,
@@ -49,7 +45,6 @@ class AppTypography {
       letterSpacing: 0.1,
     ),
 
-    // Body styles
     bodyLarge: TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w400,
@@ -66,7 +61,6 @@ class AppTypography {
       letterSpacing: 0.4,
     ),
 
-    // Label styles
     labelLarge: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w500,

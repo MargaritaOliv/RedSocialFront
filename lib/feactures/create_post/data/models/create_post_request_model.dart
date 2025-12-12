@@ -1,5 +1,3 @@
-// feactures/create_post/data/models/create_post_request_model.dart
-
 class CreatePostRequestModel {
   final String title;
   final String imageUrl;

@@ -1,9 +1,7 @@
-// feactures/post_detail/data/repository/post_detail_repository.dart
-
 import 'package:redsocial/feactures/home/domain/entities/posts.dart';
 import '../../domain/repository/post_detail_repository.dart';
 import '../datasource/post_detail_remote_datasource.dart';
-import '../../domain/entities/comment.dart'; // Importamos la entidad de dominio
+import '../../domain/entities/comment.dart';
 import '../models/add_comment_request_model.dart';
 
 class PostDetailRepositoryImpl implements PostDetailRepository {

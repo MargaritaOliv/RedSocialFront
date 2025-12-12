@@ -5,7 +5,6 @@ import 'package:redsocial/feactures/home/domain/usecase/get_posts_usecase.dart';
 enum PostsStateStatus { initial, loading, loaded, error }
 
 class PostsNotifier extends ChangeNotifier {
-  // Inyectamos el UseCase en lugar de crearlo dentro
   final GetPostsUseCase getPostsUseCase;
 
   PostsNotifier({required this.getPostsUseCase});

@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:redsocial/core/network/http_client.dart';
 import 'package:redsocial/core/error/exception.dart';
 import 'package:redsocial/feactures/home/data/models/posts_model.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Importante
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/comment_model.dart';
 import '../models/add_comment_request_model.dart';
 
@@ -17,11 +16,11 @@ abstract class PostDetailRemoteDataSource {
 
 class PostDetailRemoteDataSourceImpl implements PostDetailRemoteDataSource {
   final http.Client client;
+  final String baseUrl;
 
-  PostDetailRemoteDataSourceImpl({http.Client? client})
-      : client = client ?? HttpClient().client;
-
-  String get baseUrl => dotenv.env['API_URL'] ?? 'http://localhost:3000';
+  PostDetailRemoteDataSourceImpl({HttpClient? httpClient})
+      : client = (httpClient ?? HttpClient()).client,
+        baseUrl = (httpClient ?? HttpClient()).baseUrl;
 
   Future<Map<String, String>> _getHeaders() async {
     final prefs = await SharedPreferences.getInstance();
@@ -39,11 +38,9 @@ class PostDetailRemoteDataSourceImpl implements PostDetailRemoteDataSource {
 
   @override
   Future<PostsModel> fetchPostDetail(String postId) async {
-    final url = Uri.parse('$baseUrl/api/posts/$postId');
-
+    final url = Uri.parse('$baseUrl/posts/$postId');
     try {
       final response = await client.get(url, headers: await _getHeaders());
-
       if (response.statusCode == 200) {
         final dynamic decoded = json.decode(response.body);
         return PostsModel.fromJson(decoded);
@@ -58,11 +55,9 @@ class PostDetailRemoteDataSourceImpl implements PostDetailRemoteDataSource {
 
   @override
   Future<List<CommentModel>> fetchPostComments(String postId) async {
-    final url = Uri.parse('$baseUrl/api/posts/$postId/comments');
-
+    final url = Uri.parse('$baseUrl/posts/$postId/comments');
     try {
       final response = await client.get(url, headers: await _getHeaders());
-
       if (response.statusCode == 200) {
         final List<dynamic> decoded = json.decode(response.body);
         return decoded.map((e) => CommentModel.fromJson(e)).toList();
@@ -77,15 +72,13 @@ class PostDetailRemoteDataSourceImpl implements PostDetailRemoteDataSource {
 
   @override
   Future<CommentModel> addComment(String postId, AddCommentRequestModel request) async {
-    final url = Uri.parse('$baseUrl/api/posts/$postId/comments');
-
+    final url = Uri.parse('$baseUrl/posts/$postId/comments');
     try {
       final response = await client.post(
         url,
         headers: await _getHeaders(),
         body: json.encode(request.toJson()),
       );
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         final dynamic decoded = json.decode(response.body);
         return CommentModel.fromJson(decoded);
@@ -100,14 +93,12 @@ class PostDetailRemoteDataSourceImpl implements PostDetailRemoteDataSource {
 
   @override
   Future<void> toggleLike(String postId) async {
-    final url = Uri.parse('$baseUrl/api/posts/$postId/like');
-
+    final url = Uri.parse('$baseUrl/posts/$postId/like');
     try {
       final response = await client.post(
         url,
         headers: await _getHeaders(),
       );
-
       if (response.statusCode != 200) {
         throw ServerException("Error al dar like: ${response.statusCode}");
       }

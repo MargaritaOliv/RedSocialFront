@@ -1,4 +1,3 @@
-// feactures/post_detail/domain/usecase/get_post_full_data_usecase.dart
 
 import 'package:redsocial/feactures/home/domain/entities/posts.dart';
 import '../repository/post_detail_repository.dart';
@@ -17,7 +16,6 @@ class GetPostFullDataUseCase {
   GetPostFullDataUseCase(this.repository);
 
   Future<PostFullData> call(String postId) async {
-    // Cargamos post y comentarios en paralelo
     final postFuture = repository.getPostDetail(postId);
     final commentsFuture = repository.getPostComments(postId);
 

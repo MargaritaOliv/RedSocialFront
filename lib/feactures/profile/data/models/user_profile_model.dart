@@ -1,11 +1,4 @@
-// feactures/profile/data/models/user_profile_model.dart
-
-// Reutilizamos la entidad User y el modelo Post
 import 'package:redsocial/feactures/auth/domain/entities/user.dart';
-
-// Definimos un modelo de perfil, que puede ser la misma entidad User
-// o una extensión que incluya más datos si fuera necesario.
-// Usaremos la misma estructura que User/UserModel.
 
 class UserProfileModel extends User {
   UserProfileModel({
@@ -14,15 +7,20 @@ class UserProfileModel extends User {
     required super.email,
     super.avatar,
     super.bio,
+    super.followers,
+    super.following,
   });
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
     return UserProfileModel(
-      id: json['id'].toString(),
+      id: json['_id']?.toString() ?? '',
       name: json['name'] ?? '',
       email: json['email'] ?? '',
-      avatar: json['avatar'],
+      avatar: json['profilePic'],
+
       bio: json['bio'],
+      followers: (json['followers'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      following: (json['following'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
     );
   }
 }

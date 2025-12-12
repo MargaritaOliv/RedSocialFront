@@ -3,13 +3,18 @@ import 'package:redsocial/feactures/auth/domain/entities/user.dart';
 import 'package:redsocial/feactures/home/domain/entities/posts.dart';
 import 'package:redsocial/feactures/profile/domain/entities/profile_data.dart';
 import 'package:redsocial/feactures/profile/domain/usecase/get_profile_data_usecase.dart';
+import 'package:redsocial/feactures/profile/domain/usecase/update_profile_usecase.dart';
 
 enum ProfileStatus { initial, loading, loaded, error }
 
 class ProfileNotifier extends ChangeNotifier {
   final GetProfileDataUseCase getProfileDataUseCase;
+  final UpdateProfileUseCase updateProfileUseCase;
 
-  ProfileNotifier({required this.getProfileDataUseCase});
+  ProfileNotifier({
+    required this.getProfileDataUseCase,
+    required this.updateProfileUseCase,
+  });
 
   ProfileStatus _status = ProfileStatus.initial;
   String? _errorMessage;
@@ -28,17 +33,32 @@ class ProfileNotifier extends ChangeNotifier {
 
     try {
       final ProfileData data = await getProfileDataUseCase.call();
-
       _user = data.user;
       _posts = data.posts;
-
       _status = ProfileStatus.loaded;
       notifyListeners();
-
     } catch (e) {
       _status = ProfileStatus.error;
       _errorMessage = e.toString();
       notifyListeners();
+    }
+  }
+
+  Future<bool> updateProfile({
+    required String name,
+    required String bio,
+    required String profilePic,
+  }) async {
+    try {
+      final updatedUser = await updateProfileUseCase.call(name, bio, profilePic);
+
+      _user = updatedUser;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
     }
   }
 }

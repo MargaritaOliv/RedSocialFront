@@ -71,7 +71,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   physics: const AlwaysScrollableScrollPhysics(),
                   slivers: [
                     SliverToBoxAdapter(
-                      child: ProfileHeader(user: notifier.user!),
+                      child: ProfileHeader
+                        (user: notifier.user!,
+                        postCount: notifier.posts.length,),
                     ),
 
                     SliverToBoxAdapter(

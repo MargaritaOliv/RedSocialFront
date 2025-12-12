@@ -15,7 +15,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final http.Client client;
   final String baseUrl;
 
-  // Inyectamos el HttpClient y extraemos su client y su baseUrl
   AuthRemoteDataSourceImpl({HttpClient? httpClient})
       : client = (httpClient ?? HttpClient()).client,
         baseUrl = (httpClient ?? HttpClient()).baseUrl;
@@ -37,7 +36,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         final Map<String, dynamic> decoded = json.decode(response.body);
         return LoginResponseModel.fromJson(decoded);
       } else {
-        // Manejo básico de error basado en la respuesta de tu API
         final errorBody = json.decode(response.body);
         throw ServerException(errorBody['message'] ?? "Error al iniciar sesión");
       }
@@ -65,13 +63,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode == 201) {
-        // Tu API devuelve un mensaje de éxito, simulamos el retorno del usuario
-        // ya que el endpoint /register no devuelve el objeto usuario completo según tu código backend.
         return UserModel(
           id: '',
           name: name,
           email: email,
-          // Los demás campos se llenarán por defecto o null según tu modelo
         );
       } else {
         final errorBody = json.decode(response.body);

@@ -17,7 +17,6 @@ class PostContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header con avatar
           Row(
             children: [
               CircleAvatar(
@@ -40,13 +39,13 @@ class PostContent extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      post.authorName, // Usamos el nombre real del autor
+                      post.authorName,
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      'Publicado recientemente', // O fecha real si la tuvieras
+                      'Publicado recientemente',
                       style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurface.withOpacity(0.6),
                       ),
@@ -57,7 +56,6 @@ class PostContent extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.more_vert),
                 onPressed: () {
-                  // TODO: Mostrar opciones
                 },
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -65,7 +63,6 @@ class PostContent extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // Título
           Text(
             post.title,
             style: textTheme.headlineMedium?.copyWith(
@@ -75,7 +72,6 @@ class PostContent extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Imagen
           ClipRRect(
             borderRadius: AppShapes.cardBorderRadius,
             child: Container(
@@ -111,7 +107,6 @@ class PostContent extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Cuerpo (CORREGIDO: post.description en lugar de post.body)
           Text(
             post.description,
             style: textTheme.bodyLarge?.copyWith(
